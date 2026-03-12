@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 의존성 설치
 COPY package*.json ./
-RUN npm install --frozen-lockfile --loglevel=error
+RUN npm ci --loglevel=error
 
 # 앱 코드 복사
 COPY . .
