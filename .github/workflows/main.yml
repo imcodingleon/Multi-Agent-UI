@@ -47,6 +47,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Create .env file
+        run: echo "${{ secrets.FRONTEND_ENV }}" > .env
+
       - name: GHCR Login
         run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ secrets.REPO_USER }} --password-stdin
     
@@ -57,7 +60,7 @@ jobs:
         env:
           REPO_USER: ${{ secrets.REPO_USER }}
         run: |
-          docker-compose down
+          docker-compose down || true
           docker-compose up -d
 
       - name: Stop old container (Cleanup)
