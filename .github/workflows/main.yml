@@ -43,17 +43,21 @@ jobs:
     runs-on: [self-hosted, multi-agent-ui]
 
     steps:
+      # [핵심 추가] AWS 서버(Runner)야, 깃허브에서 최신 코드를 다운받아라!
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: GHCR Login
         run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ secrets.REPO_USER }} --password-stdin
     
       - name: Pull latest image
         run: docker pull ghcr.io/${{ secrets.REPO_USER }}/multi-agent-ui:latest
 
-      # [중요] docker-compose가 REPO_USER 변수를 인식할 수 있게 env를 주입합니다.
       - name: Run container
         env:
           REPO_USER: ${{ secrets.REPO_USER }}
         run: |
+          docker-compose down
           docker-compose up -d
 
       - name: Stop old container (Cleanup)
@@ -64,7 +68,6 @@ jobs:
       - name: Health check
         run: |
           sleep 15
-          # 로컬 호스트에서 37123 포트가 응답하는지 확인
           if curl -sSf http://localhost:37123/ > /dev/null; then
             echo "multi-agent-ui is UP"
           else
