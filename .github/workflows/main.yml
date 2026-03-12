@@ -60,7 +60,8 @@ jobs:
         env:
           REPO_USER: ${{ secrets.REPO_USER }}
         run: |
-          docker-compose down || true
+          docker rm -f multi-agent-ui nginx || true
+          docker network rm multi-agent-ui_multi-agent-net || true
           docker-compose up -d
 
       - name: Stop old container (Cleanup)

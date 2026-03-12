@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   nextjs-app:
     image: ghcr.io/${REPO_USER}/multi-agent-ui:latest
