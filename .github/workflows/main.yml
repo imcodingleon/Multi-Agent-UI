@@ -49,22 +49,26 @@ jobs:
       - name: Pull latest image
         run: docker pull ghcr.io/${{ secrets.REPO_USER }}/multi-agent-ui:latest
 
-      - name: Stop old container
+      # [중요] docker-compose가 REPO_USER 변수를 인식할 수 있게 env를 주입합니다.
+      - name: Run container
+        env:
+          REPO_USER: ${{ secrets.REPO_USER }}
+        run: |
+          docker-compose up -d
+
+      - name: Stop old container (Cleanup)
         run: |
           docker image prune -f
           docker logout
 
-      - name: Run container
-        run: |
-          docker-compose up -d
-
       - name: Health check
         run: |
           sleep 5
+          # 로컬 호스트에서 37123 포트가 응답하는지 확인
           if curl -sSf http://localhost:37123/ > /dev/null; then
             echo "multi-agent-ui is UP"
           else
             echo "Health check failed"
-            docker logs multi-agent-ui --tail 200
+            docker-compose logs --tail 200
             exit 1
           fi
